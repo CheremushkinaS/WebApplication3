@@ -1,0 +1,71 @@
+﻿@page
+@model WebApplication3.Pages.Admin.Category.IndexModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <style>
+        .course-list {
+            list-style-type: none;
+            padding-left: 0;
+            margin-bottom: 0;
+        }
+        .course-item {
+            margin: 3px 0;
+            padding: 5px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <p>
+        <a asp-page="Create">Create New Category</a>
+    </p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.Category[0].Name)</th>
+                <th>Related Courses</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Category)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.Name)</td>
+                    <td>
+                        @if (item.CourseCategories?.Any() == true)
+                        {
+                            <ul class="course-list">
+                                @foreach (var courseCategory in item.CourseCategories)
+                                {
+                                    <li class="course-item">
+                                        @courseCategory.Course?.title
+                                    </li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <span class="text-muted">No courses in this category</span>
+                        }
+                    </td>
+                    <td>
+                        <a asp-page="./Edit" asp-route-id="@item.id">Edit</a> |
+                        <a asp-page="./Details" asp-route-id="@item.id">Details</a> |
+                        <a asp-page="./Delete" asp-route-id="@item.id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</body>
+</html>

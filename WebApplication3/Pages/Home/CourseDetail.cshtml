@@ -1,0 +1,58 @@
+﻿@page
+@model WebApplication3.Pages.Home.CourseDetailModel
+@{
+    ViewData["Title"] = Model.Course?.title ?? "Курс не найден";
+}
+
+@if (Model.Course != null)
+{
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card shadow mb-4">
+                    <div class="card-body">
+                        <h1 class="mb-3">@Model.Course.title</h1>
+
+                        <div class="mb-4">
+                            @foreach (var category in Model.Course.CourseCategories)
+                            {
+                                <span class="badge bg-primary me-1 mb-2">@category.Category?.Name</span>
+                            }
+                        </div>
+
+                        <div class="course-description mb-5">
+                            <h3 class="mb-3">Описание курса</h3>
+                            <p class="lead">@Model.Course.desceiption</p>
+                        </div>
+
+                        <div class="course-details">
+                            <h3 class="mb-3">Детали курса</h3>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Преподаватель:</strong> @(Model.Course.Teacher?.Name ?? "Не указан")</p>
+                                    <p><strong>Длительность:</strong> @Model.CourseDuration недель</p>
+                                </div>
+                                <div class="col-md-6">
+                                    @if (Model.NearestGroupStartDate != null)
+                                    {
+                                        <p><strong>Начало:</strong> @Model.NearestGroupStartDate?.ToString("dd.MM.yyyy")</p>
+                                    }
+                                    <p><strong>Формат:</strong> Онлайн</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Боковая панель с ценой и кнопкой записи -->
+            <div class="col-lg-4">
+                <!-- ... остальная часть без изменений ... -->
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-danger mt-5">Курс не найден</div>
+}

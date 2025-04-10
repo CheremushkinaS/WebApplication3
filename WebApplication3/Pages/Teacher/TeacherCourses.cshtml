@@ -1,0 +1,56 @@
+﻿@page
+@model WebApplication3.Pages.Teacher.TeacherCoursesModel
+@{
+    ViewData["Title"] = "Мои курсы";
+}
+
+<h1>Мои курсы</h1>
+
+@if (!Model.Courses.Any())
+{
+    <div class="alert alert-info">
+        У вас пока нет созданных курсов
+    </div>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Название</th>
+                <th>Уроки</th>
+                <th>Материалы</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var course in Model.Courses)
+            {
+                <tr>
+                    <td>@course.title</td>
+                    <td>@course.Lessons.Count</td>
+                    <td>@course.Lessons.Sum(l => l.Materials.Count)</td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <a asp-page="./DetailCourse"
+                               asp-route-id="@course.id"
+                               class="btn btn-info btn-sm mr-1">
+                                Подробнее
+                            </a>
+                            <a asp-page="./EditCourse"
+                               asp-route-id="@course.id"
+                               class="btn btn-warning btn-sm mr-1">
+                                Редактировать
+                            </a>
+                            <a asp-page="./CreateLesson"
+                               asp-route-courseId="@course.id"
+                               class="btn btn-success btn-sm">
+                                Добавить урок
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

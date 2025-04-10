@@ -1,0 +1,57 @@
+﻿@page
+@model WebApplication3.Pages.Home.CoursesListModel
+@{
+    ViewData["Title"] = "Список курсов";
+}
+
+<div class="container">
+    <h1 class="my-4">Все курсы</h1>
+
+    <div class="row">
+        @foreach (var course in Model.Courses)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow course-card">
+                    <div class="card-body">
+                        
+                        <a asp-page="/Home/CourseDetail"
+                           asp-route-id="@course.id"
+                           class="stretched-link text-decoration-none text-dark">
+                            <h3 class="card-title">@course.title</h3>
+                        </a>
+
+                        <div class="mb-2">
+                            @if (course.discount > 0)
+                            {
+                                <span class="text-muted text-decoration-line-through">
+                                    @course.price.ToString("C2")
+                                </span>
+                                <span class="text-danger fw-bold ms-2">
+                                    @((course.price - course.discount).ToString("C2"))
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="fw-bold">@course.price.ToString("C2")</span>
+                            }
+                        </div>
+
+                        <p class="card-text text-muted">@course.desceiption</p>
+
+                        <div class="categories-container mt-auto">
+                            @foreach (var category in course.CourseCategories)
+                            {
+                                <span class="badge bg-primary me-1 mb-1">
+                                    @category.Category?.Name
+                                </span>
+                            }
+                            <span class="badge bg-secondary">
+                                @course.Teacher?.Name
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

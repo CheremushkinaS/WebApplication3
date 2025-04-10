@@ -1,0 +1,328 @@
+﻿@page
+@model WebApplication3.Pages.Teacher.CreateLessonModel
+@{
+    ViewData["Title"] = "Создать урок";
+    var tinymceApiKey = Model.Configuration["Project:TinyMCE:APIKey"];
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Боковая панель с уроками -->
+        <div class="col-md-3 bg-light border-right">
+            <div class="sticky-top pt-3">
+                <h4 class="mb-3">Уроки курса</h4>
+                <div class="list-group" id="lessonsList">
+                    @foreach (var lesson in Model.Course.Lessons)
+                    {
+                        <a href="javascript:void(0)"
+                           class="list-group-item list-group-item-action lesson-item @(lesson.Id == Model.CurrentLessonId ? "active" : "")"
+                           data-lesson-id="@lesson.Id">
+                            @lesson.Title
+                            <span class="badge badge-primary badge-pill ml-2">
+                                @lesson.Materials.Count
+                            </span>
+                        </a>
+                    }
+                    <a href="javascript:void(0)"
+                       class="list-group-item list-group-item-success"
+                       id="createNewLessonBtn">
+                        <i class="fas fa-plus-circle mr-2"></i>Новый урок
+                    </a>
+                </div>
+                <a asp-page="./EditCourse"
+                   asp-route-courseId="@Model.CourseId"
+                   class="btn btn-outline-secondary btn-block mt-3">
+                    <i class="fas fa-arrow-left"></i> Назад к курсу
+                </a>
+            </div>
+        </div>
+
+        <!-- Основной контент -->
+        <div class="col-md-9" id="mainContent">
+            <!-- Режим просмотра урока -->
+            <div id="viewLessonMode" style="display: none;">
+                <h1 class="mt-3">@Model.Course.title</h1>
+                <p class="lead">@Model.Course.desceiption</p>
+
+                @foreach (var lesson in Model.Course.Lessons)
+                {
+                    <div class="lesson-content" id="lesson-@lesson.Id" style="display: none;">
+                        <h3 class="mt-4">@lesson.Title</h3>
+                        <div class="lesson-meta mb-3">
+                            <small class="text-muted">
+                                Создан: @lesson.CreatedAt.ToString("dd.MM.yyyy")
+                            </small>
+                        </div>
+
+                        @if (lesson.Materials.Any())
+                        {
+                            <div class="materials-list">
+                                @foreach (var (material, index) in lesson.Materials.Select((m, i) => (m, i + 1)))
+                                {
+                                    <div class="material-item">
+                                        <div class="card mb-4">
+                                            <div class="card-header d-flex justify-content-between align-items-center">
+                                                <h5 class="mb-0">@material.Title</h5>
+                                                <span class="badge badge-secondary">Страница @index</span>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="material-content" data-full-content="@material.Content">
+                                                </div>
+                                                @if (material.Content.Length > 500)
+                                                {
+                                                    <button class="btn btn-link btn-sm p-0 mt-2 toggle-content">
+                                                        Показать полностью
+                                                    </button>
+                                                }
+                                            </div>
+                                            <div class="card-footer text-muted">
+                                                <small>
+                                                    Добавлен: @material.CreatedAt.ToString("g")
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-info">Материалы к уроку отсутствуют</div>
+                        }
+                    </div>
+                }
+            </div>
+
+            <!-- Режим создания урока -->
+            <div id="createLessonMode">
+                <div class="d-flex justify-content-between align-items-center mb-4 pt-3">
+                    <h1 class="h2 mb-0">Создать новый урок</h1>
+                </div>
+
+                @if (string.IsNullOrEmpty(tinymceApiKey))
+                {
+                    <div class="alert alert-danger">
+                        <strong>Ошибка!</strong> @ViewData["TinyMceError"]
+                    </div>
+                }
+
+                <form method="post" enctype="multipart/form-data" id="createLessonForm">
+                    <input type="hidden" asp-for="CourseId" />
+                    @Html.AntiForgeryToken()
+
+                    <div class="card border-0 shadow mb-4">
+                        <div class="card-body">
+                            <div class="form-group mb-4">
+                                <label asp-for="Input.Title" class="h5 font-weight-bold"></label>
+                                <input asp-for="Input.Title"
+                                       class="form-control form-control-lg"
+                                       placeholder="Введите название урока" />
+                                <span asp-validation-for="Input.Title" class="text-danger small"></span>
+                            </div>
+
+                            <h4 class="mb-3">Материалы урока</h4>
+
+                            <div id="materialsContainer">
+                                @for (var i = 0; i < Model.Input.NewMaterials.Count; i++)
+                                {
+                                    <div class="card mb-4 border">
+                                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                            <h5 class="mb-0">Материал @(i + 1)</h5>
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-danger"
+                                                    onclick="removeMaterial(this)">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="form-group">
+                                                <label>Название материала</label>
+                                                <input asp-for="Input.NewMaterials[i].Title" class="form-control" />
+                                                <span asp-validation-for="Input.NewMaterials[i].Title"
+                                                      class="text-danger small"></span>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Содержимое материала</label>
+                                                <textarea asp-for="Input.NewMaterials[i].Content"
+                                                          id="editor-@i"
+                                                          class="tinymce-editor form-control"
+                                                          rows="3"></textarea>
+                                                <span asp-validation-for="Input.NewMaterials[i].Content"
+                                                      class="text-danger small"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <button type="button"
+                                        class="btn btn-outline-primary"
+                                        onclick="addMaterialField()">
+                                    <i class="fas fa-plus-circle"></i> Добавить материал
+                                </button>
+
+                                <div class="mt-4">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-save"></i> Создать урок
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div asp-validation-summary="All" class="alert alert-danger mt-3"></div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @if (!string.IsNullOrEmpty(tinymceApiKey))
+    {
+        <script src="https://cdn.tiny.cloud/1/@(tinymceApiKey)/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    }
+
+    <script>
+        // Инициализация редакторов
+        let materialIndex = @Model.Input.NewMaterials.Count;
+        const editors = new Map();
+
+        document.addEventListener('DOMContentLoaded', function () {
+            initEditors();
+            initLessonNavigation();
+        });
+
+        function initEditors() {
+            document.querySelectorAll('.tinymce-editor').forEach((el, index) => {
+                const editorId = el.id || `editor-${Date.now()}-${index}`;
+                el.id = editorId;
+                initTinyMce(editorId);
+            });
+        }
+
+        function initTinyMce(editorId) {
+            tinymce.init({
+                selector: `#${editorId}`,
+                plugins: 'autolink lists link image charmap preview anchor media',
+                toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media',
+                height: 300,
+                content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; }',
+                media_live_embeds: true,
+                setup: function (editor) {
+                    editor.on('change', function () {
+                        editor.save();
+                    });
+                    editors.set(editorId, editor);
+                }
+            });
+        }
+
+        // Навигация по урокам
+        function initLessonNavigation() {
+            document.querySelectorAll('.lesson-item').forEach(item => {
+                item.addEventListener('click', function () {
+                    const lessonId = this.dataset.lessonId;
+                    showLessonContent(lessonId);
+                    setActiveLesson(this);
+                    showViewMode();
+                });
+            });
+
+            document.getElementById('createNewLessonBtn').addEventListener('click', function () {
+                showCreateMode();
+                clearActiveLessons();
+            });
+        }
+
+        function showLessonContent(lessonId) {
+            document.querySelectorAll('.lesson-content').forEach(el => el.style.display = 'none');
+            document.getElementById(`lesson-${lessonId}`).style.display = 'block';
+        }
+
+        function setActiveLesson(element) {
+            document.querySelectorAll('.lesson-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        function showViewMode() {
+            document.getElementById('viewLessonMode').style.display = 'block';
+            document.getElementById('createLessonMode').style.display = 'none';
+        }
+
+        function showCreateMode() {
+            document.getElementById('viewLessonMode').style.display = 'none';
+            document.getElementById('createLessonMode').style.display = 'block';
+        }
+
+        function clearActiveLessons() {
+            document.querySelectorAll('.lesson-item').forEach(el => el.classList.remove('active'));
+        }
+
+        // Управление материалами
+        function addMaterialField() {
+            const container = document.getElementById('materialsContainer');
+            const newEditorId = `editor-${Date.now()}-${materialIndex}`;
+
+            const template = `
+                        <div class="card mb-4 border">
+                            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Материал ${materialIndex + 1}</h5>
+                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeMaterial(this)">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label>Название материала</label>
+                                    <input name="Input.NewMaterials[${materialIndex}].Title" class="form-control" />
+                                    <span class="text-danger small" data-valmsg-for="Input.NewMaterials[${materialIndex}].Title"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label>Содержимое материала</label>
+                                    <textarea id="${newEditorId}"
+                                            name="Input.NewMaterials[${materialIndex}].Content"
+                                            class="tinymce-editor form-control"
+                                            rows="3"></textarea>
+                                    <span class="text-danger small" data-valmsg-for="Input.NewMaterials[${materialIndex}].Content"></span>
+                                </div>
+                            </div>
+                        </div>`;
+
+            container.insertAdjacentHTML('beforeend', template);
+            initTinyMce(newEditorId);
+            materialIndex++;
+        }
+
+        function removeMaterial(button) {
+            const card = button.closest('.card');
+            if (card) {
+                const editorId = card.querySelector('textarea').id;
+                const editor = editors.get(editorId);
+                if (editor) {
+                    editor.destroy();
+                    editors.delete(editorId);
+                }
+                card.remove();
+                reindexMaterials();
+            }
+        }
+
+        function reindexMaterials() {
+            document.querySelectorAll('#materialsContainer .card').forEach((container, index) => {
+                container.querySelector('.card-header h5').textContent = `Материал ${index + 1}`;
+                container.querySelectorAll('input, textarea').forEach(input => {
+                    const newName = input.name.replace(/\[\d+\]/g, `[${index}]`);
+                    input.name = newName;
+                });
+            });
+            materialIndex = document.querySelectorAll('#materialsContainer .card').length;
+        }
+
+        // Вспомогательные функции
+        function TruncateContent(content, maxLength) {
+            return content.length > maxLength ? content.substring(0, maxLength) + '...' : content;
+        }
+    </script>
+}

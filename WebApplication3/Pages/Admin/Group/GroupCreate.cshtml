@@ -1,0 +1,27 @@
+﻿@page
+@model WebApplication3.Pages.Admin.Group.GroupCreateModel
+@{
+    ViewData["Title"] = "Создать группу";
+}
+
+<h2>Создать группу</h2>
+
+<form method="post">
+    <div class="form-group">
+        <select asp-for="Group.Courseid" asp-items="Model.Courses" class="form-control">
+            <option value="">-- Выберите курс --</option>
+        </select>
+        <span asp-validation-for="Group.Courseid" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Group.start_date" class="control-label"></label>
+        <input asp-for="Group.start_date" type="date" class="form-control" />
+        <span asp-validation-for="Group.start_date" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Group.end_date" class="control-label"></label>
+        <input asp-for="Group.end_date" type="date" class="form-control" />
+        <span asp-validation-for="Group.end_date" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Создать</button>
+</form>

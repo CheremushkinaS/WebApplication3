@@ -1,0 +1,111 @@
+﻿
+@page
+@model IndexModel
+
+@{
+    ViewData["Title"] = "Главная страница";
+
+}
+
+<div class="container mt-5">
+    <div class="jumbotron bg-light rounded-3 p-5 mb-4">
+        <h1 class="display-4">Добро пожаловать в образовательную платформу</h1>
+        <p class="lead mt-3">Изучайте новые технологии и совершенствуйте свои навыки</p>
+        <hr class="my-4">
+        <p>Начните обучение прямо сейчас или зарегистрируйтесь для доступа ко всем возможностям</p>
+    </div>
+
+    <div class="d-flex justify-content-center gap-3 mt-4">
+        @{
+            var userId = HttpContext.Session.GetInt32("UserId");
+            var userRole = HttpContext.Session.GetInt32("UserRoleId");
+        }
+
+        @if (userId != null)
+        {
+            <!-- Авторизованный пользователь -->
+           
+        }
+        else
+        {
+            <!-- Гость -->
+            <a asp-page="/Account/Login" class="btn btn-primary btn-lg px-4">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Вход
+            </a>
+            <a asp-page="/Account/Register" class="btn btn-success btn-lg px-4">
+                <i class="bi bi-person-plus me-2"></i>Регистрация
+            </a>
+        }
+    </div>
+
+    <!-- Секция "Наши курсы" -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <h2 class="text-center mb-5">Наши курсы</h2>
+            <div class="row">
+                @foreach (var course in Model.FeaturedCourses)
+                {
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 shadow">
+                            <div class="card-body">
+                                <h5 class="card-title">@course.title</h5>
+                                <p class="card-text text-muted">@course.desceiption</p> <!-- Исправлено опечатку -->
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="categories-container">
+                                        @foreach (var category in course.CourseCategories)
+                                        {
+                                            <span class="badge bg-primary me-1 mb-1">
+                                                @category.Category.Name
+                                            </span>
+                                        }
+                                    </div>
+                                    <span class="h5">@course.price.ToString("C")</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="text-center mt-4">
+                <a asp-page="./Home/CoursesList" class="btn btn-outline-primary btn-lg">
+                    <i class="bi bi-book me-2"></i>Все курсы
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-md-8 offset-md-2 text-center">
+            <h2 class="mb-4">Почему стоит выбрать нас?</h2>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h3 class="text-primary"><i class="bi bi-collection"></i></h3>
+                            <h5>Разнообразные курсы</h5>
+                            <p>Более 100+ образовательных программ</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h3 class="text-success"><i class="bi bi-people"></i></h3>
+                            <h5>Опытные преподаватели</h5>
+                            <p>Профессионалы с реальным опытом работы</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h3 class="text-warning"><i class="bi bi-clock-history"></i></h3>
+                            <h5>Гибкий график</h5>
+                            <p>Обучение в удобное для вас время</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

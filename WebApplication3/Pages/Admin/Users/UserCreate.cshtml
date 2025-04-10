@@ -1,0 +1,83 @@
+﻿@page
+@model WebApplication3.Pages.Admin.Course.CreateCourseModel
+@{
+    ViewData["Title"] = "Создание курса";
+    Layout = "_Layout";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0"><i class="bi bi-journal-plus me-2"></i>@ViewData["Title"]</h4>
+        </div>
+
+        <div class="card-body">
+            <form method="post" class="needs-validation" novalidate>
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                <div class="row g-3">
+                    <!-- Название курса -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="CourseInput.title" class="form-label">Название курса</label>
+                            <input asp-for="CourseInput.title" class="form-control"
+                                   placeholder="Введите название курса" required>
+                            <span asp-validation-for="CourseInput.title" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <!-- Стоимость -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="CourseInput.Price" class="form-label">Стоимость ($)</label>
+                            <input asp-for="CourseInput.Price" type="number" class="form-control"
+                                   placeholder="Введите стоимость" min="0" required>
+                            <span asp-validation-for="CourseInput.Price" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <!-- Описание -->
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label asp-for="CourseInput.Description" class="form-label">Описание курса</label>
+                            <textarea asp-for="CourseInput.Description" class="form-control"
+                                      rows="4" placeholder="Добавьте подробное описание" required></textarea>
+                            <span asp-validation-for="CourseInput.Description" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <!-- Скидка -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="CourseInput.Discount" class="form-label">Скидка (%)</label>
+                            <input asp-for="CourseInput.Discount" type="number" class="form-control"
+                                   placeholder="Введите размер скидки" min="0" max="100">
+                            <span asp-validation-for="CourseInput.Discount" class="text-danger small"></span>
+                            <small class="form-text text-muted">Диапазон: 0-100%</small>
+                        </div>
+                    </div>
+
+                    <!-- Категории -->
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="CourseInput.NewCategoriesInput" class="form-label">Категории</label>
+                            <input asp-for="CourseInput.NewCategoriesInput" class="form-control"
+                                   placeholder="Пример: Программирование, Дизайн, Маркетинг">
+                            <small class="form-text text-muted">Введите категории через запятую</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Кнопки действий -->
+                <div class="mt-4 d-flex justify-content-between">
+                    <a asp-page="Index" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left me-2"></i>Назад к списку
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save me-2"></i>Создать курс
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,49 @@
+﻿@page
+@model WebApplication3.Pages.Admin.DeleteModel
+@{
+    ViewData["Title"] = "Delete User";
+    Layout = "_Layout"; // Используем общий макет
+}
+
+<div class="container mt-4">
+    <h3>Confirm User Deletion</h3>
+    <div class="alert alert-danger" role="alert">
+        Warning: This action will permanently delete the user account!
+    </div>
+
+    <div class="card border-danger mb-4">
+        <div class="card-header bg-danger text-white">
+            User Details
+        </div>
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-4 text-end">@Html.DisplayNameFor(model => model.User.Name)</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.User.Name)</dd>
+
+                <dt class="col-sm-4 text-end">@Html.DisplayNameFor(model => model.User.Email)</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.User.Email)</dd>
+
+                <dt class="col-sm-4 text-end">Password</dt>
+                <dd class="col-sm-8 text-muted">••••••••</dd>
+
+                <dt class="col-sm-4 text-end">User Role</dt>
+                <dd class="col-sm-8">
+                
+                </dd>
+            </dl>
+        </div>
+    </div>
+
+    <form method="post">
+        <input type="hidden" asp-for="User.Id" />
+
+        <div class="d-grid gap-2 d-md-block">
+            <button type="submit" class="btn btn-danger me-2">
+                <i class="bi bi-trash"></i> Confirm Delete
+            </button>
+            <a asp-page="./Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back to List
+            </a>
+        </div>
+    </form>
+</div>
